@@ -15,42 +15,70 @@
               @close="handleClose"
               background-color="#545c64"
               text-color="#fff"
-              active-text-color="#ffd04b">
-              <el-submenu index="1">
+              active-text-color="#409BFF"
+              :unique-opened="true"
+              :router="true"
+              :default-active="activePath">
+              <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
                 <template slot="title">
                   <i class="el-icon-location"></i>
-                  <span>导航一</span>
+                  <span>{{item.name}}</span>
                 </template>
-                <el-menu-item index="1-1">选项1</el-menu-item>
+                <el-menu-item
+                  :index="child.path"
+                  v-for="child in item.children"
+                  @click="saveActivePath(child.path)">
+                  <template slot="title">
+                    <i class="el-icon-menu" />
+                    <span>{{child.name}}</span>
+
+                  </template>
+                </el-menu-item>
               </el-submenu>
             </el-menu>
 
       </el-aside>
       <el-main>
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">活动管理</a></el-breadcrumb-item>
-          <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-          <el-breadcrumb-item>活动详情</el-breadcrumb-item>
-        </el-breadcrumb>
-
+        <Bread></Bread>
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import {fetchList, fetchListAndChildren} from "@/api/menu";
+import Bread from "@/components/Bread";
+
 export default {
+  data() {
+    return {
+      menuList : [],
+      activePath: '',
+    }
+  },
+  created() {
+    this.getMenuList();
+  },
+  components: {
+    Bread
+  },
   methods: {
     logout() {
       window.sessionStorage.clear();
       this.$router.push('/login');
     },
+    getMenuList() {
+      fetchListAndChildren().then(response => {
+        this.menuList = response.data;
+      })
+    },
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+    },
+    saveActivePath(activePath) {
+      this.activePath = activePath;
     }
   }
 }
@@ -75,11 +103,17 @@ export default {
   }
   .el-aside{
     background-color: #333744;
+    .el-menu{
+      border-right: none;
+    }
   }
   .el-main{
     background-color: #eaedf1;
   }
   .home-container{
     height: 100%;
+  }
+  .el-card{
+    margin-bottom: 10px;
   }
 </style>

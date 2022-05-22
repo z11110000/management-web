@@ -6,15 +6,23 @@
       </div>
 
       <el-form label-width='0px' ref="loginFormRef" class="login_form" :model="user">
-        <el-form-item>
+        <el-form-item
+          prop="username"
+          :rules="[
+          {require: true, message: '用户名不能为空'}
+        ]">
           <el-input prefix-icon="el-icon-user-solid" v-model="user.username"/>
         </el-form-item>
-        <el-form-item>
+        <el-form-item
+          prop="password"
+          :rules="[
+          {require: true, message: '密码不能为空'}
+        ]">
           <el-input prefix-icon="el-icon-lock" type="password" v-model="user.password"/>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button type="primary">登录</el-button>
-          <el-button type="info" @click="resetUser">重置</el-button>
+          <el-button type="primary" @click="login('loginFormRef')">登录</el-button>
+          <el-button type="info" @click="resetUser('loginFormRef')">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -22,20 +30,34 @@
 </template>
 
 <script>
+import { loginPassword } from "@/api/user";
+
 export default {
   data() {
     return {
       user: {
-        username: '',
-        password: ''
+        username: null,
+        password: null
       }
     }
   },
   methods: {
-    resetUser() {
-      this.$nextTick(() => {
-        this.user.username = '';
-        this.user.password = '';
+    resetUser(formName) {
+      this.$refs[formName].resetFields();
+    },
+    login: function (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          loginPassword(this.user).then(response => {
+            if (response.data.code == 0) {
+              this.$router.push("/home");
+            }else {
+              this.$message.error(response.data.msg);
+            }
+          });
+        } else {
+          return false;
+        }
       });
     }
   },

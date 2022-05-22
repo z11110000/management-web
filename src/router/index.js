@@ -8,12 +8,23 @@ Vue.use(VueRouter)
 const routes = [
   {path: '/', redirect: '/home'},
   {path: '/login', component: Login },
-  {path: '/home', component: Home},
   {
-    path: '/member',
-    redirect: '/member/list',
-    name: 'member',
-    meta: {title: '用户管理', icon: 'ums-role'}
+    path: '/home',
+    component: Home,
+    redirect: '/welcome',
+    meta: {title: "首页", path: "/"},
+    children: [
+      {
+        path: '/welcome',
+        component: () => import('@/views/welcome/index'),
+        meta: {title: "广场", path: "/"}
+      },
+      {
+        path: '/menu',
+        component: () => import('@/views/menu/index'),
+        meta: {title: "菜单管理", path: "/menu"}
+      }
+    ]
   }
 ]
 

@@ -3,8 +3,12 @@ import App from './App.vue'
 import router from './router'
 import './assets/global.css'
 import './plugins/element.js'
+import * as echarts from "echarts";
 
 Vue.config.productionTip = false
+
+
+Vue.use(echarts)
 
 new Vue({
   router,
